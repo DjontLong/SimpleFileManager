@@ -20,22 +20,55 @@ public class SimpleFileManager {
     public static void handleCommand(int command, Scanner scanner) {
         switch (command) {
             case 1:
-                System.out.print("Введите имя новой папки: ");
-                String newNameDir = scanner.nextLine();
+                System.out.print("Для создания папки в текущей директории нажмите <.>, либо укажите путь: ");
+                String inputNamePath = scanner.nextLine();
 
                 try {
-                    Path newDirPath = currentDirectory.resolve(newNameDir);
-                    Files.createDirectory(newDirPath);
+                    if (inputNamePath.equals(".")) {
+                        System.out.print("Введите имя новой папки: ");
+                        String newNameDir = scanner.nextLine();
+
+                        Path newDirPath = currentDirectory.resolve(newNameDir);
+                        Files.createDirectory(newDirPath);
+                        System.out.println("Папка успешно создана в директории: " + newDirPath.toAbsolutePath().normalize());
+                    } else {
+                        System.out.print("Введите имя новой папки: ");
+                        String newNameDir = scanner.nextLine();
+
+                        Path path = Path.of(inputNamePath);
+                        if (Files.exists(path)) {
+                            Path newDirPath = path.resolve(newNameDir);
+                            Files.createDirectory(newDirPath);
+                            currentDirectory = path;
+                            System.out.println("Папка успешно создана в директори: " + newDirPath.toAbsolutePath());
+                        }
+                    }
                 } catch (InvalidPathException | IOException e) {
                     System.out.println("Ошибка: " + e.getMessage() + "\n" + "Повторите попытку!");
                 }
+
+//                System.out.print("Введите имя новой папки: ");
+//                String newNameDir = scanner.nextLine();
+//
+//                try {
+//                    Path newDirPath = currentDirectory.resolve(newNameDir);
+//                    Files.createDirectory(newDirPath);
+//                } catch (InvalidPathException | IOException e) {
+//                    System.out.println("Ошибка: " + e.getMessage() + "\n" + "Повторите попытку!");
+//                }
                 break;
 
             case 2:
+                System.out.println("Введите имя нового файла: ");
+                String newNameFile = scanner.nextLine();
 
+                try {
+
+                } catch (InvalidPathException e) {
+                }
 
             case 5:
-                System.out.print("Для просмотра текущей директории нажмите <.>, либо введите путь: ");
+                System.out.print("Для просмотра текущей директории нажмите <.>, либо укажите путь: ");
                 String choice = scanner.nextLine();
 
                 if (choice.equals(".")) {
