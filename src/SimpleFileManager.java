@@ -2,6 +2,7 @@ import javax.crypto.spec.PSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
 import java.util.Scanner;
 
 public class SimpleFileManager {
@@ -152,8 +153,10 @@ public class SimpleFileManager {
                     // Переводим в килобайты
                     double sizeFileKB = Math.round(sizeInBytes / 1024.0);
 
+                    FileTime getLastModified = Files.getLastModifiedTime(file);
+
                     if (Files.isRegularFile(file)) {
-                        System.out.println("[FILE] " + "[" + sizeFileKB + " KB" + "] " + file.getFileName());
+                        System.out.println("[FILE] " + "[" + sizeFileKB + " KB" + "] " + "[" + getLastModified + "] " + file.getFileName());
                         countFiles++;
                     } else if (Files.isDirectory(file.toAbsolutePath())) {
                         long dirSize = calculateDirectorySize(file);
