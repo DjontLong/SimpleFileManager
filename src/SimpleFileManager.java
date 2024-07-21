@@ -1,8 +1,8 @@
-import javax.crypto.spec.PSource;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class SimpleFileManager {
@@ -134,47 +134,45 @@ public class SimpleFileManager {
         }
     }
 
+
     public static void displayDirectoryContent(Scanner scanner) {
         System.out.print("Для просмотра текущей директории нажмите <.>, либо укажите путь: ");
         String inputPath = scanner.nextLine();
         Path pathDir = Path.of(inputPath);
+
         if (Files.exists(pathDir)) {
             try (DirectoryStream<Path> displayDirectory = Files.newDirectoryStream(pathDir)) {
-
-                // Добавляем счетчик файлов
                 int countFiles = 0;
-                // Добавляем счетчик папок
                 int countDir = 0;
 
                 for (Path file : displayDirectory) {
+                    try {
+                        if (Files.isRegularFile(file)) {
+                            long sizeInBytes = Files.size(file);
+                            double sizeFileKB = Math.round(sizeInBytes / 1024.0);
 
-                    // Добавляем отображение размера файлов и папок
-                    long sizeInBytes = Files.size(file);
-                    // Переводим в килобайты
-                    double sizeFileKB = Math.round(sizeInBytes / 1024.0);
-
-                    FileTime getLastModified = Files.getLastModifiedTime(file);
-
-                    if (Files.isRegularFile(file)) {
-                        System.out.println("[FILE] " + "[" + sizeFileKB + " KB" + "] " + "[" + getLastModified + "] " + file.getFileName());
-                        countFiles++;
-                    } else if (Files.isDirectory(file.toAbsolutePath())) {
-                        long dirSize = calculateDirectorySize(file);
-                        double sizeDirKB = Math.round(dirSize / 1024.0);
-
-                        System.out.println("[DIR] " + "[" + sizeDirKB + " KB" + "] " + file.getFileName());
-                        countDir++;
+                            System.out.println("[FILE] " + "[" + sizeFileKB + " KB" + " | " + getFormattedDate(file) + "] " + file.getFileName());
+                            countFiles++;
+                        } else if (Files.isDirectory(file)) {
+                            long dirSize = calculateDirectorySize(file);
+                            double sizeDirKB = Math.round(dirSize / 1024.0);
+                            System.out.println("[DIR] " + "[" + sizeDirKB + " KB" + " | " + getFormattedDate(file) + "] " + file.getFileName());
+                            countDir++;
+                        }
+                    } catch (IOException e) {
+                        // Игнорируем ошибки доступа
                     }
-                    currentDirectory = pathDir.toAbsolutePath().normalize();
                 }
 
                 System.out.println("┌──────────────┐");
                 System.out.println("|   files: " + countFiles);
                 System.out.println("|   folders: " + countDir);
-                System.out.println("└────────────────────────────────────────────────┘");
+                System.out.println("└──────────────┘");
+
+                currentDirectory = pathDir.toAbsolutePath().normalize();
 
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+//                System.out.println("Ошибка при чтении содержимого директории: " + e.getMessage());
             }
         } else {
             System.out.println("Неправильные данные! Повторите попытку!");
@@ -235,13 +233,28 @@ public class SimpleFileManager {
         long size = 0;
         try (DirectoryStream<Path> files = Files.newDirectoryStream(directory)) {
             for (Path file : files) {
-                if (Files.isRegularFile(file)) {
-                    size += Files.size(file);
-                } else if (Files.isDirectory(file)) {
-                    size += calculateDirectorySize(file);
+                try {
+                    if (Files.isRegularFile(file)) {
+                        size += Files.size(file);
+                    } else if (Files.isDirectory(file)) {
+                        size += calculateDirectorySize(file);
+                    }
+                } catch (IOException e) {
+//                    System.out.println("Ошибка при доступе к файлу/папке: " + file + " - " + e.getMessage());
                 }
             }
         }
         return size;
+    }
+
+    public static String getFormattedDate(Path file) throws IOException {
+        FileTime getLastModified = Files.getLastModifiedTime(file);
+        // Преобразование FileTime в миллисекунды
+        long millis = getLastModified.toMillis();
+        // Задаём шаблон отображения
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+        // Возвращаем сформированную дату
+        return dateFormat.format(new Date(millis));
     }
 }
