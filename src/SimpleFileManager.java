@@ -26,44 +26,44 @@ public class SimpleFileManager {
             case 3 -> deleteFileOrDirectory(scanner);
             case 4 -> renameFileOrDirectory(scanner);
             case 5 -> displayDirectoryContent(scanner);
-            case 0 -> System.out.println("Выход из программы ... ");
-            default -> System.out.println("Неизвестная команда. Повторите попытку!");
+            case 0 -> System.out.println(Messages.EXIT_PROGRAM);
+            default -> System.out.println(Messages.UNKNOWN_COMMAND);
         }
     }
 
     public static void createDirectory(Scanner scanner) {
-        System.out.print("Для создания папки в текущей директории нажмите <.>, либо укажите путь: ");
+        System.out.print(Messages.CREATE_FOLDER);
         String inputNameDirPath = scanner.nextLine();
         Path path = Path.of(inputNameDirPath);
 
         try {
             if (inputNameDirPath.equals(".")) {
-                System.out.print("Введите имя новой папки: ");
+                System.out.print(Messages.ENTER_NEW_NAME_FOLDER);
                 String inputNewNameDir = scanner.nextLine();
 
                 Path newDirPath = currentDirectory.resolve(inputNewNameDir);
                 if (Files.exists(newDirPath)) {
-                    System.out.println("Папка с таким именем уже существует: " + newDirPath.toAbsolutePath().normalize());
+                    System.out.println(Messages.FOLDER_ALREADY_EXISTS + newDirPath.toAbsolutePath().normalize());
                 } else {
                     Files.createDirectory(newDirPath);
-                    System.out.println("Папка успешно создана в директории: " + newDirPath.toAbsolutePath().normalize());
+                    System.out.println(Messages.FOLDER_SUCCESSFULLLY_CREATED + newDirPath.toAbsolutePath().normalize());
                 }
 
             } else {
                 if (Files.exists(path)) {
-                    System.out.print("Введите имя новой папки: ");
+                    System.out.print(Messages.ENTER_NEW_NAME_FOLDER);
                     String newNameDir = scanner.nextLine();
 
                     Path newDirPath = path.resolve(newNameDir);
                     if (Files.exists(newDirPath)) {
-                        System.out.println("Папка с таким именем уже существует: " + newDirPath.toAbsolutePath().normalize());
+                        System.out.println(Messages.FOLDER_ALREADY_EXISTS + newDirPath.toAbsolutePath().normalize());
                     } else {
                         Files.createDirectory(newDirPath);
                         currentDirectory = path;
-                        System.out.println("Папка успешно создана в директори: " + newDirPath.toAbsolutePath());
+                        System.out.println(Messages.FOLDER_SUCCESSFULLLY_CREATED + newDirPath.toAbsolutePath());
                     }
                 } else {
-                    System.out.println("Неправильные данные! Повторите попытку!");
+                    System.out.println(Messages.INVALID_DATA);
                 }
             }
         } catch (InvalidPathException | IOException e) {
@@ -72,36 +72,36 @@ public class SimpleFileManager {
     }
 
     public static void createFile(Scanner scanner) {
-        System.out.print("Для создания файла в текущей директории нажмите <.>, либо укажите путь: ");
+        System.out.print(Messages.CREATE_FILE);
         String inputNameFilePath = scanner.nextLine();
         Path pathToFile = Path.of(inputNameFilePath);
 
         try {
             if (inputNameFilePath.equals(".")) {
-                System.out.print("Введите имя нового файла: ");
+                System.out.print(Messages.ENTER_NEW_NAME_FILE);
                 String inputNewNameFile = scanner.nextLine();
 
                 Path newFilePath = currentDirectory.resolve(inputNewNameFile);
                 if (Files.exists(newFilePath)) {
-                    System.out.println("Файл с таким именем уже существует: " + newFilePath.toAbsolutePath().normalize());
+                    System.out.println(Messages.FILE_ALREADY_EXISTS + newFilePath.toAbsolutePath().normalize());
                 } else {
                     Files.createFile(newFilePath);
-                    System.out.println("Файл успешно создан в директории: " + newFilePath.toAbsolutePath().normalize());
+                    System.out.println(Messages.FILE_SUCCESSFULlLY_CREATED + newFilePath.toAbsolutePath().normalize());
                 }
             } else {
                 if (Files.exists(pathToFile)) {
-                    System.out.print("Введите имя нового файла: ");
+                    System.out.print(Messages.ENTER_NEW_NAME_FILE);
                     String inputNewNameFile = scanner.nextLine();
 
                     Path pathFile = pathToFile.resolve(inputNewNameFile);
                     if (Files.exists(pathFile)) {
-                        System.out.println("Файл с таким именем уже существует: " + pathFile.toAbsolutePath().normalize());
+                        System.out.println(Messages.FILE_ALREADY_EXISTS + pathFile.toAbsolutePath().normalize());
                     } else {
                         Files.createFile(pathFile);
-                        System.out.println("Файл успешно создан в директории: " + pathFile.toAbsolutePath());
+                        System.out.println(Messages.FILE_SUCCESSFULlLY_CREATED + pathFile.toAbsolutePath());
                     }
                 } else {
-                    System.out.println("Неправильные данные! Повторите попытку!");
+                    System.out.println(Messages.INVALID_DATA);
                 }
             }
         } catch (InvalidPathException | IOException e) {
@@ -110,12 +110,12 @@ public class SimpleFileManager {
     }
 
     public static void renameFileOrDirectory(Scanner scanner) {
-        System.out.print("Чтобы переименовать - укажите путь до файла или папки: ");
+        System.out.print(Messages.RENAME_FILE_FOLDER);
         String inputPathRename = scanner.nextLine();
         Path pathToFileStart = Path.of(inputPathRename);
 
         if (Files.exists(pathToFileStart)) {
-            System.out.println("Задайте новое имя файла или папки: ");
+            System.out.print(Messages.CREATE_NEW_NAME);
             String newNameFileOrDir = scanner.nextLine();
 
             // Получаем родительский путь
@@ -125,18 +125,17 @@ public class SimpleFileManager {
 
             try {
                 Files.move(pathToFileStart, newPathForRenameFileOrDir);
-                System.out.println("Файл или папка успешно создан переименован в директории: " + newPathForRenameFileOrDir.toAbsolutePath());
+                System.out.println(Messages.FILE_SUCCESSFULlLY_RENAME + newPathForRenameFileOrDir.toAbsolutePath());
             } catch (IOException e) {
-                System.out.println("Ошибка при переименовании: " + e.getMessage());
+                System.out.println(Messages.RENAME_ERROR + e.getMessage());
             }
         } else {
-            System.out.println("Файл или директория не существуют.");
+            System.out.println(Messages.FILE_OR_FOLDER_NOT_EXIST);
         }
     }
 
-
     public static void displayDirectoryContent(Scanner scanner) {
-        System.out.print("Для просмотра текущей директории нажмите <.>, либо укажите путь: ");
+        System.out.print(Messages.DISPLAY_CURRENT_DIRECTORY);
         String inputPath = scanner.nextLine();
         Path pathDir = Path.of(inputPath);
 
@@ -180,7 +179,7 @@ public class SimpleFileManager {
     }
 
     public static void deleteFileOrDirectory(Scanner scanner) {
-        System.out.print("Чтобы удалить - укажите путь до файла или папки: ");
+        System.out.print(Messages.DELETE_FILE_FOLDER);
         String inputPathDelete = scanner.nextLine();
         Path pathForDelete = Path.of(inputPathDelete);
 
@@ -192,29 +191,27 @@ public class SimpleFileManager {
                         countFiles++;
                     }
                     if (countFiles > 0) {
-                        System.out.println("Папка содержит вложенные файлы или подпапки!\n" +
-                                "Вы уверены, что хотите удалить?\n" +
-                                "Для удаления нажмите <Y>, для отмены <N>");
+                        System.out.println(Messages.FOLDER_CONTAINS_SUBFOLDER);
                         String inputActionForDelete = scanner.nextLine();
                         if (inputActionForDelete.equalsIgnoreCase("Y")) {
                             deleteDirectoryRecursively(pathForDelete);
-                            System.out.println("Папка успешно удалена по пути: " + pathForDelete.toAbsolutePath().normalize());
+                            System.out.println(Messages.FOLDER_SUCCESSFULLY_DELETE + pathForDelete.toAbsolutePath().normalize());
                         } else if (inputActionForDelete.equalsIgnoreCase("N")) {
-                            System.out.println("Отмена удаления ...");
+                            System.out.println(Messages.CANCEL_DELETE);
                         } else {
-                            System.out.println("Введена неправильная команда. Повторите попытку!");
+                            System.out.println(Messages.INVALID_COMMAND);
                         }
                     } else {
                         Files.delete(pathForDelete);
-                        System.out.println("Файл у спешно удалён по пути: " + pathForDelete.toAbsolutePath().normalize());
+                        System.out.println(Messages.FILE_SUCCESSFULLY_DELETE + pathForDelete.toAbsolutePath().normalize());
                     }
                 }
             } else if (Files.isRegularFile(pathForDelete)) {
                 Files.delete(pathForDelete);
-                System.out.println("Файл успешно удалён по пути: " + pathForDelete.toAbsolutePath().normalize());
+                System.out.println(Messages.FILE_SUCCESSFULLY_DELETE + pathForDelete.toAbsolutePath().normalize());
             }
         } catch (IOException e) {
-            System.out.println("Произошла ошибка: " + e.getMessage());
+            System.out.println(Messages.ERROR_OCCURRED + e.getMessage());
         }
     }
 
